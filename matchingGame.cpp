@@ -1,5 +1,6 @@
 #include "MatchingGame.h"
 #include "CardGame.h"
+#include "Control.h"
 #include <algorithm> // For std::shuffle
 #include <ctime>     // For std::time (seeding shuffle)
 #include <cstdlib>
@@ -23,7 +24,13 @@ void MatchingGame::startGame() {
 				cardGame = new CardGame(5, 4, "Normal");
 				cardGame->initializeGame();
 				cardGame->drawGameBoard();
-				waitForInput();
+
+				while (!cardGame->isGameOver()) {
+					int input = keyControl(); // 사용자 입력 받기
+					cardGame->handleInput(input); // 입력 처리
+					system("cls");
+					cardGame->drawGameBoard(); // 게임 보드 다시 그리기
+				}
 			}
 			else if (GameModeKey == 1) { // 크레이지
 				system("cls");
@@ -32,7 +39,13 @@ void MatchingGame::startGame() {
 				cardGame = new CardGame(6, 5, "Crazy");
 				cardGame->initializeGame();
 				cardGame->drawGameBoard();
-				waitForInput();
+				
+				while (!cardGame->isGameOver()) {
+					int input = keyControl(); // 사용자 입력 받기
+					cardGame->handleInput(input); // 입력 처리
+					system("cls");
+					cardGame->drawGameBoard(); // 게임 보드 다시 그리기
+				}
 			}
 			// GameModeKey == 2 는 뒤로가기이므로 if문 탈출
 		}

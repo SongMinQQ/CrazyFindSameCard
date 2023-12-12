@@ -12,7 +12,9 @@ public:
     CardGame(int width, int height, const string& difficulty);
     void initializeGame();
     void drawGameBoard();
+    void showCardTemporarily(int row, int col);
     void handleInput(int input); // 이 함수는 Control 클래스의 keyControl 결과를 받아 사용합니다.
+    void checkMatch(Card* firstCard, Card* secondCard);
     bool isGameOver(); // 게임이 끝났는지 확인하는 함수
 
 private:
