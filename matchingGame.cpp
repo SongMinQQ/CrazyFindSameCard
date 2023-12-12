@@ -1,59 +1,59 @@
 #include "MatchingGame.h"
-#include "Control.h"
-#include <iostream>
+#include "CardGame.h"
+#include <algorithm> // For std::shuffle
+#include <ctime>     // For std::time (seeding shuffle)
+#include <cstdlib>
+#include <conio.h>
 
-MatchingGame::MatchingGame() : difficulty("Normal") {}
+//MatchingGame::MatchingGame() : difficulty("Normal") {}
+MatchingGame::MatchingGame() {
+	cardGame = nullptr; // 초기에는 nullptr로 설정
+}
 
 void MatchingGame::startGame() {
 	while (true) {
 		GameName();
 		int menuKey = menuDraw();
-		if (menuKey == 0) {//게임시작
+		if (menuKey == 0) { // 게임 시작
 			int GameModeKey = GameMode();
 			if (GameModeKey == 0) { // 노말
-
+				system("cls");
+				// Normal 모드 카드 게임 객체 생성 및 초기화
+				delete cardGame; // 이전에 생성된 객체가 있다면 삭제
+				cardGame = new CardGame(5, 4, "Normal");
+				cardGame->initializeGame();
+				cardGame->drawGameBoard();
+				waitForInput();
 			}
 			else if (GameModeKey == 1) { // 크레이지
-
+				system("cls");
+				// Crazy 모드 카드 게임 객체 생성 및 초기화
+				delete cardGame;
+				cardGame = new CardGame(6, 5, "Crazy");
+				cardGame->initializeGame();
+				cardGame->drawGameBoard();
+				waitForInput();
 			}
-			// GameModeKey == 2 는 뒤로가기므로 if문 탈출
+			// GameModeKey == 2 는 뒤로가기이므로 if문 탈출
 		}
-		else if (menuKey == 1) {//게임 방법
+		else if (menuKey == 1) { // 게임 방법
 			GameInfo();
 		}
 		else if (menuKey == 2) {
+			delete cardGame; // 게임 종료 전에 메모리 정리
 			return; // 게임 종료
 		}
 		system("cls");
 	}
 
+	delete cardGame; // 마지막으로 메모리 정리
 	system("cls"); // 화면 초기화
-
-
-
-	//selectDifficulty();
-	//if (difficulty == "Normal") {
-	//    playNormal();
-	//}
-	//else if (difficulty == "Crazy") {
-	//    playCrazy();
-	//}
 }
 
-//void MatchingGame::selectDifficulty() {
-//    std::cout << "난이도를 선택하세요. (Normal/Crazy): ";
-//    std::cin >> difficulty;
-//}
-//
-//void MatchingGame::playNormal() {
-//    std::cout << "노말 모드를 선택하셨습니다. 게임을 시작합니다.\n";
-//    // 여기에 Normal 모드의 게임 로직을 구현하세요.
-//}
-//
-//void MatchingGame::playCrazy() {
-//    std::cout << "Crazy모드를 선택하셨습니다. 게임을 시작합니다.\n";
-//    // 여기에 Crazy 모드의 게임 로직을 구현하세요.
-//}
+void MatchingGame::waitForInput() {
+	cout << "\n계속하려면 아무 키나 누르세요...";
+	(void)_getch(); // _getch 함수는 사용자가 키를 누를 때까지 기다립니다.
+}
 
 void MatchingGame::GameName() {
 	cout << "\n\n\n\n";
@@ -157,6 +157,7 @@ int MatchingGame::GameMode() {
 		}
 		}
 	}
-
-
 }
+
+
+

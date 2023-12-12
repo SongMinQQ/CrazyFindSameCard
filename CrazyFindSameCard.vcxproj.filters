@@ -24,12 +24,21 @@
     <ClCompile Include="Control.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="cardGame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="matchingGame.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Control.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cardGame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="card.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
