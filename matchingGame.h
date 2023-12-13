@@ -16,6 +16,7 @@ public:
     int menuDraw();
     void GameInfo();
     int GameMode();
+    void init();
     void waitForInput();
 
 private:

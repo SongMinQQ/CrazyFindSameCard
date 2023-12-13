@@ -5,6 +5,8 @@
 #include <ctime>     // For std::time (seeding shuffle)
 #include <cstdlib>
 #include <conio.h>
+#include <thread>   // std::this_thread::sleep_for을 위한 헤더
+
 
 //MatchingGame::MatchingGame() : difficulty("Normal") {}
 MatchingGame::MatchingGame() {
@@ -12,6 +14,7 @@ MatchingGame::MatchingGame() {
 }
 
 void MatchingGame::startGame() {
+	init();
 	while (true) {
 		GameName();
 		int menuKey = menuDraw();
@@ -24,13 +27,15 @@ void MatchingGame::startGame() {
 				cardGame = new CardGame(5, 4, "Normal");
 				cardGame->initializeGame();
 				cardGame->drawGameBoard();
-
+				cardGame->startTimer(); // 타이머 시작
 				while (!cardGame->isGameOver()) {
-					int input = keyControl(); // 사용자 입력 받기
+					int input = keyControl(); // 키 입력이 있을 때만 keyControl() 호출
 					cardGame->handleInput(input); // 입력 처리
 					system("cls");
-					cardGame->drawGameBoard(); // 게임 보드 다시 그리기
+					cardGame->drawGameBoard();
 				}
+				cardGame->setGameClearTime(); // 게임 클리어 시간 기록
+				cardGame->endGame();
 			}
 			else if (GameModeKey == 1) { // 크레이지
 				system("cls");
@@ -46,6 +51,8 @@ void MatchingGame::startGame() {
 					system("cls");
 					cardGame->drawGameBoard(); // 게임 보드 다시 그리기
 				}
+				cardGame->setGameClearTime(); // 게임 클리어 시간 기록
+				cardGame->endGame();
 			}
 			// GameModeKey == 2 는 뒤로가기이므로 if문 탈출
 		}
@@ -157,7 +164,7 @@ int MatchingGame::GameMode() {
 			break;
 		}
 		case DOWN: {
-			if (y < 9) {
+			if (y < 8) {
 				gotoxy(x - 2, y);
 				cout << " ";
 				gotoxy(x - 2, ++y);
@@ -172,5 +179,13 @@ int MatchingGame::GameMode() {
 	}
 }
 
+void MatchingGame::init() {
+	system("mode con cols=84 lines=30 | title CrazyFindSameCard");
 
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO ConsoleCursor;
+	ConsoleCursor.bVisible = 0; // 0이 커서 숨기기
+	ConsoleCursor.dwSize = 1;
+	SetConsoleCursorInfo(consoleHandle, &ConsoleCursor);
+}
 

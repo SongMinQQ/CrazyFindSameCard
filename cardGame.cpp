@@ -14,7 +14,9 @@ using namespace std;
 
 CardGame::CardGame(int width, int height, const string& diff)
     : gameWidth(width), gameHeight(height), difficulty(diff),
-    selectedRow(0), selectedCol(0), firstSelectedCard(nullptr) {}
+    selectedRow(0), selectedCol(0), firstSelectedCard(nullptr), count(0) {
+    // count를 0으로 초기화
+}
 
 void CardGame::initializeGame() {
     // 카드를 초기화하고 섞는 로직
@@ -45,6 +47,11 @@ void CardGame::initializeGame() {
 void CardGame::drawGameBoard() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // 콘솔 핸들 얻기
 
+    cout << "   게임 난이도: " << difficulty
+        << "            count: " << count << endl;
+
+
+    cout << "-----------------------------------------------------------------------------" << endl;
     for (int row = 0; row < gameHeight; ++row) {
         // 각 카드의 상단 테두리 그리기
         for (int col = 0; col < gameWidth; ++col) {
@@ -144,30 +151,30 @@ void CardGame::handleInput(int input) {
             firstSelectedCard = selectedCard;
             firstSelectedCard->selected = true;
         }
-        else {
-            // 두 번째 카드를 선택하는 경우
-            if (selectedCard != firstSelectedCard && !selectedCard->matched) {
-                selectedCard->selected = true;
-                system("cls");
-                drawGameBoard(); // 두 번째 카드 선택 시 보드 업데이트
-                if (firstSelectedCard->value == selectedCard->value) {
-                    // 매칭 성공
-                    firstSelectedCard->matched = true;
-                    selectedCard->matched = true;
+            else {
+                // 두 번째 카드를 선택하는 경우
+                if (selectedCard != firstSelectedCard && !selectedCard->matched) {
+                    selectedCard->selected = true;
+                    count++; // 카운트 즏가
+                    system("cls");
+                    drawGameBoard(); // 두 번째 카드 선택 시 보드 업데이트
+                    if (firstSelectedCard->value == selectedCard->value) {
+                        // 매칭 성공
+                        firstSelectedCard->matched = true;
+                        selectedCard->matched = true;
+                    }
+                    else {
+                        // 매칭 실패: 카드를 일시적으로 보여주고 가리기
+                        showCardTemporarily(selectedRow, selectedCol);
+                        firstSelectedCard->selected = false;
+                        selectedCard->selected = false;
+                    }
+                    firstSelectedCard = nullptr; // 선택 초기화
                 }
-                else {
-                    // 매칭 실패: 카드를 일시적으로 보여주고 가리기
-                    showCardTemporarily(selectedRow, selectedCol);
-                    firstSelectedCard->selected = false;
-                    selectedCard->selected = false;
-                }
-                firstSelectedCard = nullptr; // 선택 초기화
             }
+            break;
         }
-        break;
     }
-}
-
 void CardGame::checkMatch(Card* firstCard, Card* secondCard) {
     if (firstCard && secondCard && firstCard != secondCard) {
         if (firstCard->value == secondCard->value) {
@@ -191,4 +198,12 @@ bool CardGame::isGameOver() {
         }
     }
     return true; // 모든 카드가 매칭되었으면 게임 종료
+}
+
+void CardGame::endGame() {
+    setGameClearTime(); // 게임 클리어 시간 기록
+    system("cls");
+    cout << "게임 클리어! 시간: " << getGameClearTime() << " 초" << endl;
+    cout << "\n --- 아무 키나 누르세요 --- " << endl;
+    _getch(); // 사용자의 키 입력을 기다림
 }
