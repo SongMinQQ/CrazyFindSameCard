@@ -9,6 +9,9 @@
 using namespace std;
 
 class CardGame {
+
+
+
     int count; // 선택 횟수
     int game_time; // 게임 클리어 시간
     std::chrono::time_point<std::chrono::steady_clock> startTime; // 게임 시작 시간
@@ -23,6 +26,8 @@ public:
     bool isGameOver(); // 게임이 끝났는지 확인하는 함수
 
     void endGame();
+
+    void shuffleUnmatchedCards();
 
     void startTimer() {
         startTime = std::chrono::steady_clock::now();
@@ -42,6 +47,8 @@ public:
 
 private:
     vector<vector<Card>> cards;
+    vector<Card> tempUnmatchedCards; // 매칭되지 않은 카드를 임시로 저장할 벡터
+
     int selectedRow, selectedCol;
     Card* firstSelectedCard;
     int gameWidth, gameHeight;

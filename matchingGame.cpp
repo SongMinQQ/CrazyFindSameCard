@@ -44,7 +44,7 @@ void MatchingGame::startGame() {
 				cardGame = new CardGame(6, 5, "Crazy");
 				cardGame->initializeGame();
 				cardGame->drawGameBoard();
-				
+				cardGame->startTimer(); // 타이머 시작
 				while (!cardGame->isGameOver()) {
 					int input = keyControl(); // 사용자 입력 받기
 					cardGame->handleInput(input); // 입력 처리
@@ -128,7 +128,7 @@ void MatchingGame::GameInfo() {
 	cout << "                                    [ 조 작 법 ]\n\n";
 	cout << "                         이 동 : W, A, S, D\n";
 	cout << "                         선 택 : 스 페 이 스 바\n\n\n\n\n\n\n";
-	cout << "                 개 발 자 : 학번 이름 학번 이름\n\n";
+	cout << "                 개 발 자 : 20192346 송민규 / 20193295 장진혁\n\n";
 	cout << "          스 페 이 스 바 를   누 르 면   메 인 화 면 으 로   이 동 합 니 다 .";
 
 	while (true) {

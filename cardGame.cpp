@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ctime>
-
+#include <random>  // std::default_random_engine과 std::shuffle을 사용하기 위함
 
 
 #include <chrono>
@@ -19,28 +19,24 @@ CardGame::CardGame(int width, int height, const string& diff)
 }
 
 void CardGame::initializeGame() {
-    // 카드를 초기화하고 섞는 로직
     cards.clear();
     cards.resize(gameHeight, vector<Card>(gameWidth));
     char cardValue = 'A';
 
     // 카드 할당
-    for (int row = 0; row < gameHeight; ++row) {
-        for (int col = 0; col < gameWidth; ++col) {
-            cards[row][col] = Card(cardValue);
-            if ((row * gameWidth + col) % 2 == 1) {
-                // 다음 카드 값으로 넘어감
-                cardValue = cardValue == 'Z' ? 'A' : cardValue + 1;
-            }
-        }
+    for (int i = 0; i < gameHeight * gameWidth / 2; ++i) {
+        cards[i / gameWidth][i % gameWidth] = Card(cardValue);
+        cards[(i + gameHeight * gameWidth / 2) / gameWidth][(i + gameHeight * gameWidth / 2) % gameWidth] = Card(cardValue);
+        cardValue = cardValue == 'Z' ? 'A' : cardValue + 1;
     }
 
     // 카드 섞기
-    srand(static_cast<unsigned>(time(0)));
+    std::random_device rd;
+    std::default_random_engine engine(rd());
     for (auto& row : cards) {
-        random_shuffle(row.begin(), row.end());
+        std::shuffle(row.begin(), row.end(), engine);
     }
-
+    
     // 다른 초기화 코드...
 }
 
@@ -168,6 +164,12 @@ void CardGame::handleInput(int input) {
                         showCardTemporarily(selectedRow, selectedCol);
                         firstSelectedCard->selected = false;
                         selectedCard->selected = false;
+
+                        // "Crazy" 모드에서만 카드를 다시 섞음
+                        if (difficulty == "Crazy") {
+                            shuffleUnmatchedCards();
+                        }
+
                     }
                     firstSelectedCard = nullptr; // 선택 초기화
                 }
@@ -175,6 +177,7 @@ void CardGame::handleInput(int input) {
             break;
         }
     }
+
 void CardGame::checkMatch(Card* firstCard, Card* secondCard) {
     if (firstCard && secondCard && firstCard != secondCard) {
         if (firstCard->value == secondCard->value) {
@@ -206,4 +209,33 @@ void CardGame::endGame() {
     cout << "게임 클리어! 시간: " << getGameClearTime() << " 초" << endl;
     cout << "\n --- 아무 키나 누르세요 --- " << endl;
     _getch(); // 사용자의 키 입력을 기다림
+}
+
+void CardGame::shuffleUnmatchedCards() {
+    std::random_device rd;
+    std::default_random_engine engine(rd());
+
+    tempUnmatchedCards.clear(); // 벡터를 초기화합니다.
+
+    for (int row = 0; row < gameHeight; ++row) {
+        for (int col = 0; col < gameWidth; ++col) {
+            if (!cards[row][col].matched) {
+                // 매칭되지 않은 카드를 임시 벡터에 저장
+                tempUnmatchedCards.push_back(cards[row][col]);
+            }
+        }
+    }
+
+    // 임시 벡터의 카드를 섞음
+    std::shuffle(tempUnmatchedCards.begin(), tempUnmatchedCards.end(), engine);
+
+    // 섞은 카드를 다시 게임 보드에 배치
+    int index = 0;
+    for (int row = 0; row < gameHeight; ++row) {
+        for (int col = 0; col < gameWidth; ++col) {
+            if (!cards[row][col].matched) {
+                cards[row][col] = tempUnmatchedCards[index++];
+            }
+        }
+    }
 }
