@@ -33,7 +33,6 @@ void MatchingGame::startGame() {
 void MatchingGame::playGame(const string& mode, int width, int height) {
 	system("cls");
 
-	delete cardGame;  //  이전에 생성된 객체가 있다면 삭제,
 	cardGame = new CardGame(width, height, mode);
 	cardGame->initializeGame();
 	cardGame->drawGameBoard();
@@ -48,6 +47,7 @@ void MatchingGame::playGame(const string& mode, int width, int height) {
 
 	cardGame->setGameClearTime();  // 게임 클리어 시간 기록
 	cardGame->endGame();
+	delete cardGame; // 객체 삭제ㅇ
 }
 
 void MatchingGame::GameName() {
