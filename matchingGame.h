@@ -8,22 +8,20 @@ using namespace std;
 
 class MatchingGame : public control {
 public:
-    //CardGame cardGame;
-    MatchingGame();
+    MatchingGame() { // cardGame 생성자 초기화ㅇ
+        cardGame = nullptr; // 초기에는 nullptr로 설정
+    }
     void startGame();
-    void selectDifficulty();
+    void playGame(const string& mode, int width, int height);
     void GameName();
     int menuDraw();
     void GameInfo();
     int GameMode();
     void init();
-    void waitForInput();
 
 private:
     string difficulty;
     CardGame* cardGame;
-    void playNormal();
-    void playCrazy();
 };
 
 #endif

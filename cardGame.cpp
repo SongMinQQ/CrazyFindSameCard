@@ -1,12 +1,8 @@
 #include "CardGame.h"
 #include "Control.h"
-
 #include <iostream>
-#include <algorithm>
-#include <ctime>
+
 #include <random>  // std::default_random_engine과 std::shuffle을 사용하기 위함
-
-
 #include <chrono>
 #include <thread>
 
@@ -24,20 +20,16 @@ void CardGame::initializeGame() {
     char cardValue = 'A';
 
     // 카드 할당
-    for (int i = 0; i < gameHeight * gameWidth / 2; ++i) {
-        cards[i / gameWidth][i % gameWidth] = Card(cardValue);
-        cards[(i + gameHeight * gameWidth / 2) / gameWidth][(i + gameHeight * gameWidth / 2) % gameWidth] = Card(cardValue);
-        cardValue = cardValue == 'Z' ? 'A' : cardValue + 1;
+    //  카드의 최대가 52개가 넘지 않는다는 가정 하 ( 알바벳 개수 26개 * 카드 한쌍 2개 = 52개 )
+    //  만약 7 * 8 같은 배열이면 코드 재구성 해야함. 왜냐면 Z 다음의 아스키코드는 알파벳이 아니기 때문
+    for (int i = 0; i < gameHeight * gameWidth; i += 2) { 
+        cards[i / gameWidth][i % gameWidth] = Card(cardValue); // 첫 번째 카드 할당
+        cards[(i + 1) / gameWidth][(i + 1) % gameWidth] = Card(cardValue); // 두 번째 카드 할당
+        cardValue++; // 다음 카드 값으로 이동
     }
 
-    // 카드 섞기
-    std::random_device rd;
-    std::default_random_engine engine(rd());
-    for (auto& row : cards) {
-        std::shuffle(row.begin(), row.end(), engine);
-    }
-    
-    // 다른 초기화 코드...
+    //// 카드 섞기
+    shuffleUnmatchedCards();
 }
 
 void CardGame::drawGameBoard() {
@@ -113,7 +105,7 @@ void CardGame::showCardTemporarily(int row, int col) {
     drawGameBoard();
 
     // 1초 대기
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    this_thread::sleep_for(chrono::seconds(1));
 
     // 게임 보드 다시 그리기 (이 함수 내에서는 카드 상태 변경 없음)
     system("cls");
@@ -147,48 +139,34 @@ void CardGame::handleInput(int input) {
             firstSelectedCard = selectedCard;
             firstSelectedCard->selected = true;
         }
-            else {
-                // 두 번째 카드를 선택하는 경우
-                if (selectedCard != firstSelectedCard && !selectedCard->matched) {
-                    selectedCard->selected = true;
-                    count++; // 카운트 즏가
-                    system("cls");
-                    drawGameBoard(); // 두 번째 카드 선택 시 보드 업데이트
-                    if (firstSelectedCard->value == selectedCard->value) {
-                        // 매칭 성공
-                        firstSelectedCard->matched = true;
-                        selectedCard->matched = true;
-                    }
-                    else {
-                        // 매칭 실패: 카드를 일시적으로 보여주고 가리기
-                        showCardTemporarily(selectedRow, selectedCol);
-                        firstSelectedCard->selected = false;
-                        selectedCard->selected = false;
-
-                        // "Crazy" 모드에서만 카드를 다시 섞음
-                        if (difficulty == "Crazy") {
-                            shuffleUnmatchedCards();
-                        }
-
-                    }
-                    firstSelectedCard = nullptr; // 선택 초기화
-                }
-            }
-            break;
-        }
-    }
-
-void CardGame::checkMatch(Card* firstCard, Card* secondCard) {
-    if (firstCard && secondCard && firstCard != secondCard) {
-        if (firstCard->value == secondCard->value) {
-            // 매칭 성공
-            firstCard->matched = true;
-            secondCard->matched = true;
-        }
         else {
-            // 매칭 실패
-            // 필요한 경우 처리
+            // 두 번째 카드를 선택하는 경우
+            if (selectedCard != firstSelectedCard && !selectedCard->matched) {
+                selectedCard->selected = true;
+                count++; // 카운트 즏가
+                system("cls");
+                drawGameBoard(); // 두 번째 카드 선택 시 보드 업데이트
+                if (firstSelectedCard->value == selectedCard->value) {
+                    // 매칭 성공
+                    firstSelectedCard->matched = true;
+                    selectedCard->matched = true;
+                }
+                else {
+                    // 매칭 실패: 카드를 일시적으로 보여주고 가리기
+                    showCardTemporarily(selectedRow, selectedCol);
+                    firstSelectedCard->selected = false;
+                    selectedCard->selected = false;
+
+                    // "Crazy" 모드에서만 카드를 다시 섞음
+                    if (difficulty == "Crazy") {
+                        shuffleUnmatchedCards();
+                    }
+
+                }
+                firstSelectedCard = nullptr; // 선택 초기화
+            }
         }
+        break;
     }
 }
 
@@ -212,8 +190,8 @@ void CardGame::endGame() {
 }
 
 void CardGame::shuffleUnmatchedCards() {
-    std::random_device rd;
-    std::default_random_engine engine(rd());
+    random_device rd;
+    default_random_engine engine(rd());
 
     tempUnmatchedCards.clear(); // 벡터를 초기화합니다.
 
@@ -227,7 +205,7 @@ void CardGame::shuffleUnmatchedCards() {
     }
 
     // 임시 벡터의 카드를 섞음
-    std::shuffle(tempUnmatchedCards.begin(), tempUnmatchedCards.end(), engine);
+    shuffle(tempUnmatchedCards.begin(), tempUnmatchedCards.end(), engine);
 
     // 섞은 카드를 다시 게임 보드에 배치
     int index = 0;
